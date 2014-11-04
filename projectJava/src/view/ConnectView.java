@@ -1,5 +1,6 @@
 package view;
 
+import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.RemoteDevice;
 import javax.swing.JPanel;
 
@@ -16,12 +17,8 @@ import java.io.IOException;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
-
-import jssc.SerialPortList;
-
 import javax.swing.JLabel;
 
-import controller.Communication;
 import bluetooth.Searcher;
 
 public class ConnectView extends JPanel {
@@ -33,11 +30,16 @@ public class ConnectView extends JPanel {
 		setMinimumSize(new Dimension(300, 125));
 		setLayout(new MigLayout("", "[grow]", "[20][][]"));
 		
-		JLabel wybierzPortLabel = new JLabel("Wybierz port");
+		JLabel wybierzPortLabel = new JLabel("Wybierz urz鉅zenie");
 		add(wybierzPortLabel, "cell 0 0,alignx center,aligny bottom");
 		
 		final JComboBox<String> comboBox = new JComboBox<String>();
-		comboBox.setModel(new DefaultComboBoxModel<String>(Searcher.getNames()));
+		try {
+			comboBox.setModel(new DefaultComboBoxModel<String>(Searcher.getNames()));
+		} catch (BluetoothStateException e1) {
+			JOptionPane.showMessageDialog(Application.getMaintFrame(),"Nie zosta這 znalezione urz鉅zenie bluetooth", "Brak bluetooth",JOptionPane.ERROR_MESSAGE);
+			System.exit(0);
+		}
 		add(comboBox, "cell 0 1,grow");
 		
 		JButton btnPocz = new JButton("Po\u0142\u0105cz");
@@ -57,19 +59,14 @@ public class ConnectView extends JPanel {
 						}
 					}
 				}
-				Application.getCommunication().tryConnect(selectedDevice);
-				Application.getCommunication().close();
-//				if (Application.getCommunication().open()) {
-//					System.out.println("Hura");
-//					Application.getCommunication().close();
-//				} else {
-//					JOptionPane.showMessageDialog(Application.getMaintFrame(),"Z造 port","Z造 port",JOptionPane.ERROR_MESSAGE);
-//				}
-//				Searcher.sendMessageToDevice("dupa");
+				if (Application.getCommunication().tryConnect(selectedDevice)) {
+					Application.getMaintFrame().setJPanel(new CraneView());
+				} else {
+					JOptionPane.showMessageDialog(Application.getMaintFrame(),"Z貫 urz鉅zenie","Zosta這 wybrane z貫 urz鉅zenie lub urz鉅zenie nie odpowiada",JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		add(btnPocz, "cell 0 2,alignx center,aligny center");
-
 	}
 
 }

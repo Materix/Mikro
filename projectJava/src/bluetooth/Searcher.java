@@ -14,8 +14,9 @@ public class Searcher {
 	private static boolean searched = false;
 	public static List<RemoteDevice> bluetoothDevice = new ArrayList<RemoteDevice>();
 	
-	public static void search() {
+	public static void search() throws BluetoothStateException {
 		try{
+			
 			LocalDevice localDevice = LocalDevice.getLocalDevice();
 			DiscoveryAgent agent = localDevice.getDiscoveryAgent();         
 			agent.startInquiry(DiscoveryAgent.GIAC, new MyDiscoveryListener());
@@ -30,11 +31,15 @@ public class Searcher {
 			searched = true;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			if (e.getLocalizedMessage().equals("BluetoothStack not detected")) {
+				throw new BluetoothStateException();
+			} else {
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	public static String[] getNames() {
+	public static String[] getNames() throws BluetoothStateException {
 		if (!searched) {
 			Searcher.search();
 		}

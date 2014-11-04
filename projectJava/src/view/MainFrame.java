@@ -28,6 +28,7 @@ public class MainFrame extends JFrame {
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setContentPane(this.contentPane);
+		pack();
 	}
 
 }

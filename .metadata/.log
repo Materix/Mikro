@@ -1,0 +1,45 @@
+!SESSION 2014-10-27 14:09:43.580 -----------------------------------------------
+eclipse.buildId=4.4.1.M20140925-0400
+java.version=1.8.0_20
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pl_PL
+Framework arguments:  -product org.eclipse.epp.package.java.product -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product -data D:\Studia\Sem5\Mikro -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.m2e.logback.configuration 2 0 2014-10-27 14:09:47.330
+!MESSAGE Exception while setting up logging:org.eclipse.osgi.internal.framework.EquinoxConfiguration$1 cannot be cast to java.lang.String
+!STACK 0
+java.lang.ClassCastException: org.eclipse.osgi.internal.framework.EquinoxConfiguration$1 cannot be cast to java.lang.String
+	at org.eclipse.m2e.logback.configuration.LogHelper.logJavaProperties(LogHelper.java:26)
+	at org.eclipse.m2e.logback.configuration.LogPlugin.loadConfiguration(LogPlugin.java:189)
+	at org.eclipse.m2e.logback.configuration.LogPlugin.configureLogback(LogPlugin.java:144)
+	at org.eclipse.m2e.logback.configuration.LogPlugin.access$2(LogPlugin.java:107)
+	at org.eclipse.m2e.logback.configuration.LogPlugin$1.run(LogPlugin.java:62)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+!ENTRY org.eclipse.ui 4 4 2014-10-27 14:09:49.413
+!MESSAGE Conflicting handlers for it.baeyens.arduino.actions.ArduinoBuildAction: {it.baeyens.arduino.actions.BuildHandler} vs {it.baeyens.arduino.actions.BuildHandler}
+
+!ENTRY org.eclipse.egit.ui 2 0 2014-10-27 14:12:59.094
+!MESSAGE Warning: EGit couldn't detect the installation path "gitPrefix" of native Git. Hence EGit can't respect system level
+Git settings which might be configured in ${gitPrefix}/etc/gitconfig under the native Git installation directory.
+The most important of these settings is core.autocrlf. Git for Windows by default sets this parameter to true in
+this system level configuration. The Git installation location can be configured on the
+Team > Git > Configuration preference page's 'System Settings' tab.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.ui 4 4 2014-10-27 14:13:08.817
+!MESSAGE Conflicting handlers for it.baeyens.arduino.actions.ArduinoBuildAction: {it.baeyens.arduino.actions.BuildHandler} vs {it.baeyens.arduino.actions.BuildHandler}
+
+!ENTRY org.eclipse.ui 2 2 2014-10-27 14:13:08.993
+!MESSAGE Invalid property category path: org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build (bundle: org.eclipse.cdt.ui, propertyPage: org.eclipse.cdt.managedbuilder.ui.properties.BuildLogPreferencePage)
+
+!ENTRY org.eclipse.ui 4 4 2014-10-27 14:13:24.514
+!MESSAGE Conflicting handlers for it.baeyens.arduino.actions.ArduinoBuildAction: {it.baeyens.arduino.actions.BuildHandler} vs {it.baeyens.arduino.actions.BuildHandler}
+
+!ENTRY org.eclipse.ui 4 4 2014-10-27 14:13:28.455
+!MESSAGE Conflicting handlers for it.baeyens.arduino.actions.ArduinoBuildAction: {it.baeyens.arduino.actions.BuildHandler} vs {it.baeyens.arduino.actions.BuildHandler}
+
+!ENTRY org.eclipse.ui 4 4 2014-10-28 11:22:08.797
+!MESSAGE Conflicting handlers for it.baeyens.arduino.actions.ArduinoBuildAction: {it.baeyens.arduino.actions.BuildHandler} vs {it.baeyens.arduino.actions.BuildHandler}

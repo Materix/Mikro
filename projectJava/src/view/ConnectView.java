@@ -10,6 +10,7 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.JButton;
 
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -25,9 +26,9 @@ public class ConnectView extends JPanel {
 	private static final long serialVersionUID = -3713321785875878557L;
 
 	public ConnectView() {
-		setPreferredSize(new Dimension(300, 125));
-		setMaximumSize(new Dimension(300, 125));
-		setMinimumSize(new Dimension(300, 125));
+		setPreferredSize(new Dimension(300, 100));
+		setMaximumSize(new Dimension(300, 100));
+		setMinimumSize(new Dimension(300, 100));
 		setLayout(new MigLayout("", "[grow]", "[20][][]"));
 		
 		JLabel wybierzPortLabel = new JLabel("Wybierz urz퉐zenie");
@@ -59,10 +60,15 @@ public class ConnectView extends JPanel {
 						}
 					}
 				}
-				if (Application.getCommunication().tryConnect(selectedDevice)) {
+				try {
+					if (Application.getCommunication().tryConnect(selectedDevice)) {
+						Application.getMaintFrame().setJPanel(new CraneView());
+					} else {
+						JOptionPane.showMessageDialog(Application.getMaintFrame(),"Z쿮 urz퉐zenie","Zosta쿽 wybrane z쿮 urz퉐zenie lub urz퉐zenie nie odpowiada",JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (HeadlessException | IOException e) {
 					Application.getMaintFrame().setJPanel(new CraneView());
-				} else {
-					JOptionPane.showMessageDialog(Application.getMaintFrame(),"Z쿮 urz퉐zenie","Zosta쿽 wybrane z쿮 urz퉐zenie lub urz퉐zenie nie odpowiada",JOptionPane.ERROR_MESSAGE);
+					//JOptionPane.showMessageDialog(Application.getMaintFrame(),"Z쿮 urz퉐zeni"," wybrane z쿮 urz퉐zenie lub urz퉐zenie nie odpowiada",JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});

@@ -2,8 +2,6 @@ package view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -12,6 +10,7 @@ import javax.swing.JPanel;
 
 import model.Application;
 import model.Coord;
+import model.Crane;
 import model.Move;
 import model.Transfer;
 import net.miginfocom.swing.MigLayout;
@@ -21,6 +20,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 
@@ -28,6 +29,7 @@ import controller.Communication;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Point;
 import java.io.IOException;
 
 public class CraneView extends JPanel {
@@ -44,7 +46,7 @@ public class CraneView extends JPanel {
 	public CraneView() {
 		setLayout(new MigLayout("", "[grow][][][][]", "[][][][][grow][]"));
 		
-		CranePanel cranePanel = new CranePanel();
+		final CranePanel cranePanel = new CranePanel();
 		add(cranePanel, "cell 0 0 1 6,grow");
 		
 		final JRadioButton move = new JRadioButton("Obr\u00F3\u0107");
@@ -53,7 +55,7 @@ public class CraneView extends JPanel {
 		ButtonGroup radioGroup = new ButtonGroup();
 		radioGroup.add(move);
 		
-		JRadioButton transfer = new JRadioButton("Przenie\u015B");
+		final JRadioButton transfer = new JRadioButton("Przenie\u015B");
 		transfer.setSelected(true);
 		add(transfer, "cell 2 0");
 		radioGroup.add(transfer);
@@ -64,14 +66,16 @@ public class CraneView extends JPanel {
 		JLabel fromXLabel = new JLabel("x=");
 		add(fromXLabel, "cell 1 2,alignx trailing");
 		
-		fromX = new JTextField();
+		fromX = new JTextField("0");
+		fromX.setName("fromX");
 		add(fromX, "cell 2 2,alignx center");
 		fromX.setColumns(10);
 		
 		JLabel fromYLabel = new JLabel("y=");
 		add(fromYLabel, "cell 3 2,alignx trailing");
 		
-		fromY = new JTextField();
+		fromY = new JTextField("0");
+		fromY.setName("fromY");
 		add(fromY, "cell 4 2,growx");
 		fromY.setColumns(10);
 		
@@ -81,14 +85,16 @@ public class CraneView extends JPanel {
 		JLabel toXLabel = new JLabel("x=");
 		add(toXLabel, "cell 1 4,alignx trailing,aligny top");
 		
-		toX = new JTextField();
+		toX = new JTextField("0");
+		toX.setName("toX");
 		add(toX, "cell 2 4,growx,aligny top");
 		toX.setColumns(10);
 		
 		JLabel toYLabel = new JLabel("y=");
 		add(toYLabel, "cell 3 4,alignx trailing,aligny top");
 		
-		toY = new JTextField();
+		toY = new JTextField("0");
+		toY.setName("toY");
 		add(toY, "cell 4 4,growx,aligny top");
 		toY.setColumns(10);
 		
@@ -115,33 +121,74 @@ public class CraneView extends JPanel {
 				fromY.setEditable(true);
 			}
 		});
-		KeyListener checkField = new KeyListener() {
+		CaretListener checkField = new CaretListener() {
 			
 			@Override
-			public void keyTyped(KeyEvent e) {
-				JTextField source = (JTextField)e.getSource();
+			public void caretUpdate(CaretEvent arg0) {
+				JTextField source = (JTextField)arg0.getSource();
 				String text = source.getText();
-				if (e.getKeyChar() >= ' ' && e.getKeyChar() <= 167) {
-					text += e.getKeyChar();
-				}
-				if (text.matches("\\d*\\D+\\d*")) {
+				if (!text.matches("-?\\d+")) {
 					source.setBackground(new Color(255, 100, 100));
 				} else {
-					source.setBackground(Color.white);
+					int war = Integer.parseInt(text);
+					String name = source.getName();
+					Component source2 = null;
+					int war2 = 0;
+					if (name.equals("fromX")) {
+						try {
+							war2 = Integer.parseInt(fromY.getText());
+						} catch (NumberFormatException e1) {
+							war2 = 0;
+						}
+						source2 = fromY;
+					} else if (name.equals("fromY")) {
+						try {
+							war2 = war;
+							war = Integer.parseInt(fromX.getText());
+						} catch (NumberFormatException e1) {
+							war2 = 0;
+						}
+						source2 = fromX;
+					} else if (name.equals("toX")) {
+						try {
+							war2 = Integer.parseInt(toY.getText());
+						} catch (NumberFormatException e1) {
+							war2 = 0;
+						}
+						source2 = toY;
+					} else if (name.equals("toY")) {
+						try {
+							war2 = war;
+							war = Integer.parseInt(toX.getText());
+						} catch (NumberFormatException e1) {
+							war2 = 0;
+						}
+						source2 = toX;
+					} else {
+						source2 = source;
+					}
+					if (war2 * war2 + war * war > Crane.round * Crane.round || war2 * war2 + war * war < Crane.forbiden_round * Crane.forbiden_round) {
+						source.setBackground(new Color(255, 100, 100));
+						source2.setBackground(new Color(255, 100, 100));
+					} else {
+						source.setBackground(Color.white);
+						source2.setBackground(Color.white);
+						Point p = CranePanel.cartesianToPanel(new Coord(war, -war2));
+						for (MouseListener ml : cranePanel.getMouseListeners()) {
+							if (name.equals("toX") || name.equals("toY")) {
+								ml.mousePressed(new MouseEvent(toX, 0, 0, 0, p.x, p.y, 0, 0, 0, false, MouseEvent.BUTTON3));
+							} else {
+								ml.mousePressed(new MouseEvent(toX, 0, 0, 0, p.x, p.y, 0, 0, 0, false, MouseEvent.BUTTON1));
+							}
+						}
+					}
 				}
 			}
-			
-			public void keyReleased(KeyEvent e) {
-			}
-			
-			@Override
-			public void keyPressed(KeyEvent e) {
-			}
 		};
-		toX.addKeyListener(checkField);
-		toY.addKeyListener(checkField);
-		fromX.addKeyListener(checkField);
-		fromY.addKeyListener(checkField);
+		toX.addCaretListener(checkField);
+		toY.addCaretListener(checkField);
+		fromX.addCaretListener(checkField);
+		fromY.addCaretListener(checkField);
 		
 		cranePanel.addMouseListener(new MouseListener() {
 			
@@ -153,8 +200,15 @@ public class CraneView extends JPanel {
 			
 			@Override
 			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
+				if (!e.getSource().equals(toX)) {
+					if (e.getButton() == MouseEvent.BUTTON1) {
+						fromX.setText(Integer.toString(CranePanel.panelToCartesian(e.getPoint()).x));
+						fromY.setText(Integer.toString(CranePanel.panelToCartesian(e.getPoint()).y));
+					} else if (e.getButton() == MouseEvent.BUTTON3) {
+						toX.setText(Integer.toString(CranePanel.panelToCartesian(e.getPoint()).x));
+						toY.setText(Integer.toString(CranePanel.panelToCartesian(e.getPoint()).y));	
+					}
+				}
 			}
 			
 			@Override
@@ -171,10 +225,7 @@ public class CraneView extends JPanel {
 			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (move.isSelected()) {
-					toX.setText(Integer.toString((int)e.getPoint().getX()));
-					toY.setText(Integer.toString((int)e.getPoint().getY()));
-				}
+				
 				
 			}
 		});

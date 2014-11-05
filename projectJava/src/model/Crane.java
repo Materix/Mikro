@@ -3,12 +3,16 @@ package model;
 import model.Coord;
 
 public class Crane {
-	private Coord position; 
+	public final static int round = 300;
+	public final static int forbiden_round = 50;
+
+	
+	public static Coord position; 
 	private int heightHook;
 	private State state;
 	
 	public Crane(Coord position, int heightHook) {
-		this.position = position;
+		Crane.position = position;
 		this.heightHook = heightHook;
 	}
 	

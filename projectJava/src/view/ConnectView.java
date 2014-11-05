@@ -64,11 +64,10 @@ public class ConnectView extends JPanel {
 					if (Application.getCommunication().tryConnect(selectedDevice)) {
 						Application.getMaintFrame().setJPanel(new CraneView());
 					} else {
-						JOptionPane.showMessageDialog(Application.getMaintFrame(),"Z쿮 urz퉐zenie","Zosta쿽 wybrane z쿮 urz퉐zenie lub urz퉐zenie nie odpowiada",JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(Application.getMaintFrame(), "Zosta쿽 wybrane z쿮 urz퉐zenie lub urz퉐zenie nie odpowiada", "Z쿮 urz퉐zenie", JOptionPane.ERROR_MESSAGE);
 					}
 				} catch (HeadlessException | IOException e) {
-					Application.getMaintFrame().setJPanel(new CraneView());
-					//JOptionPane.showMessageDialog(Application.getMaintFrame(),"Z쿮 urz퉐zeni"," wybrane z쿮 urz퉐zenie lub urz퉐zenie nie odpowiada",JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(Application.getMaintFrame(),"Zosta쿽 wybrane z쿮 urz퉐zenie lub urz퉐zenie nie odpowiada", "Z쿮 urz퉐zenie", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});

@@ -203,7 +203,7 @@ public class CraneView extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					Application.getCommunication().sendMessage("s");
+					Application.getCommunication().sendStop();
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(Application.getMaintFrame(),"Urz¹dzenie nie odpowiada", "Brak odpowiedzi",JOptionPane.ERROR_MESSAGE);
 				}

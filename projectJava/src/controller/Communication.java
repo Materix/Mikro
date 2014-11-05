@@ -3,87 +3,77 @@ package controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import model.*;
 
 import javax.bluetooth.*;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
-import javax.obex.ClientSession;
-import javax.tools.ToolProvider;
-
-import bluetooth.Searcher;
 
 public class Communication {
+	private static final int MAX_TRIED = 15;
 	private RemoteDevice device;
 	private String URL;
 	StreamConnection session;
+	OutputStream os;
+	InputStream is;
 	
 	public Communication() {
 	}
 	
-	public boolean tryConnect(RemoteDevice rm) {
+	public boolean tryConnect(RemoteDevice rm) throws IOException {
 		this.device = rm;
 		this.URL = "btspp://" + this.device.getBluetoothAddress() + ":1";
-		try {
-			session = (StreamConnection) Connector.open(this.URL, Connector.READ_WRITE);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		this.sendMessage("ZURAW");
-		
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		session = (StreamConnection) Connector.open(this.URL, Connector.READ_WRITE);
+		os = session.openOutputStream();
+		is = session.openInputStream();
+		this.sendMessage("c");
 		if (this.receiveString().equals("OK")) {
-			System.out.println("Sie uda³o");
 			return true;
 		} else {
-			System.out.println("Dupa");
 			this.close();
 			return false;
 		}
 	}
 	
-	public void sendMessage(String msg){
-		try{
-			OutputStream os = session.openOutputStream();
-			os.write(msg.getBytes());
-			os.close();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
+	public void sendMessage(String msg) throws IOException {
+		msg += "$";
+		os.write(msg.getBytes());
+		if (receiveString().equals("Gotowe")) {
+			
+		} else {
+			throw new IOException(); // TODO dodaæ listenera na receive
 		}
 	}
 	
-	public String receiveString() {
-		InputStream is;
-		try {
-			is = session.openInputStream();
-			String receive = new String();
-			char c;
-			while ((c = (char)(is.read())) != 13) {
-				System.out.println((int)c);
-				receive += c;
+	public String receiveString() throws IOException {
+		int tried = 0;
+		while(is.available() == 0) {
+			tried++;
+			if (tried >= MAX_TRIED) {
+				throw new IOException("Przekroczona ilosc prob");
 			}
-			System.out.println("Odebra³em wiadomoœæ " + receive + " Koniec. ");
-			return receive;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		return new String();
+		String receive = new String();
+		char c;
+		while ((c = (char)(is.read())) != 13) {
+			receive += c;
+		}
+		System.out.println(receive);
+		return receive;
 	}
 	
 	public void close() {
 		try {
+			sendMessage("d");
+			is.close();
+			os.close();
 			session.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -91,11 +81,11 @@ public class Communication {
 		}
 	}
 	
-	public void sendCoord(Coord coord) {
-		this.sendMessage(coord.toSend());
+	public void sendMove(Move move) throws IOException {
+		this.sendMessage(move.toSend());
 	}
 	
-	public void sendTranser(Transfer transer) {
+	public void sendTranser(Transfer transer) throws IOException {
 		this.sendMessage(transer.toSend());
 	}
 }

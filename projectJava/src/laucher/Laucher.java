@@ -2,7 +2,6 @@ package laucher;
 
 import java.awt.EventQueue;
 
-import bluetooth.Searcher;
 import controller.Communication;
 import model.Application;
 import view.MainFrame;
@@ -14,6 +13,7 @@ public class Laucher {
 			public void run() {
 				try {
 					MainFrame frame = new MainFrame();
+					Application.setMainFrame(frame);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();

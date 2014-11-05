@@ -10,8 +10,13 @@ import java.awt.event.MouseListener;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 
+import model.Application;
+import model.Coord;
+import model.Move;
+import model.Transfer;
 import net.miginfocom.swing.MigLayout;
 
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -19,8 +24,11 @@ import javax.swing.JButton;
 
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 
+import controller.Communication;
+
 import java.awt.Color;
 import java.awt.Component;
+import java.io.IOException;
 
 public class CraneView extends JPanel {
 
@@ -170,7 +178,37 @@ public class CraneView extends JPanel {
 				
 			}
 		});
+		start.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Communication communication = Application.getCommunication();
+				try {
+					if (move.isSelected()) {
+						communication.sendMove(new Move(new Coord(Integer.parseInt(toX.getText()), Integer.parseInt(toY.getText()))));
+					} else {
+						communication.sendTranser(new Transfer(new Coord(Integer.parseInt(fromX.getText()), Integer.parseInt(fromY.getText())), new Coord(Integer.parseInt(toX.getText()), Integer.parseInt(toY.getText()))));
+					}
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(Application.getMaintFrame(),"Urz¹dzenie nie odpowiada", "Brak odpowiedzi",JOptionPane.ERROR_MESSAGE);
+					e1.printStackTrace();
+				} catch (NumberFormatException e1) {
+					JOptionPane.showMessageDialog(Application.getMaintFrame(),"Proszê o uzupe³nienie wszystkich pól", "",JOptionPane.ERROR_MESSAGE);
+				}
+				
+			}
+		});
+		stop.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Application.getCommunication().sendMessage("s");
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(Application.getMaintFrame(),"Urz¹dzenie nie odpowiada", "Brak odpowiedzi",JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 	}
-	
 
 }

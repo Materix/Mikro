@@ -1,7 +1,5 @@
 package model;
 
-import controller.Converter;
-
 public class Coord {
 	int x;
 	int y;

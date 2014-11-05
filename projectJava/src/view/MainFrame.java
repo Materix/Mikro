@@ -1,9 +1,14 @@
 package view;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
+import model.Application;
 
 
 public class MainFrame extends JFrame {
@@ -12,6 +17,14 @@ public class MainFrame extends JFrame {
 
 	public MainFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //TODO zmieniæ na roz³¹czanie
+		this.addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				Application.getCommunication().close();
+				System.exit(0);
+			}
+		});
+
+
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException
@@ -19,6 +32,7 @@ public class MainFrame extends JFrame {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		setTitle("¯uraw");
 		setJPanel(new ConnectView());
 	}
 	

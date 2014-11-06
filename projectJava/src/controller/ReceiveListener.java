@@ -34,8 +34,10 @@ public class ReceiveListener implements Runnable {
 				synchronized (Communication.lock) {
 					Communication.lock.wait(); //waiting for notify
 				}
+				System.out.println("dupa");
 				if (this.listenedStream != null) {
 					synchronized(Communication.lock) {
+						System.out.println("ddu");
 						while(listenedStream.available() == 0) {
 						}
 						String receive = new String();
@@ -43,6 +45,7 @@ public class ReceiveListener implements Runnable {
 						while ((c = (char)(listenedStream.read())) != 13) {
 							receive += c;
 						}
+						System.out.println(receive);
 						if (receive.equals("OK")) {
 							
 						}

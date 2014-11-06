@@ -51,6 +51,7 @@ public class Communication {
 	
 	public String receiveString() throws IOException {
 		int tried = 0;
+		String receive;
 		synchronized (Communication.lock) {
 			while(is.available() == 0) {
 				tried++;
@@ -64,14 +65,14 @@ public class Communication {
 					e.printStackTrace();
 				}
 			}
-			String receive = new String();
+			receive = new String();
 			char c;
 			while ((c = (char)(is.read())) != 13) {
 				receive += c;
 			}
 			System.out.println(receive);
-			return receive;
 		}
+		return receive;
 	}
 	
 	public void close() {

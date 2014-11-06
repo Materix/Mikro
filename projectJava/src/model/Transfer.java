@@ -13,4 +13,8 @@ public class Transfer {
 	public String toSend() {
 		return "tf" + from.toSend() + "t" + to.toSend();
 	}
+	
+	public Coord getTo() {
+		return to;
+	}
 }

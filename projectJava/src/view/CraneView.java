@@ -12,9 +12,11 @@ import model.Application;
 import model.Coord;
 import model.Crane;
 import model.Move;
+import model.State;
 import model.Transfer;
 import net.miginfocom.swing.MigLayout;
 
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JLabel;
@@ -26,6 +28,7 @@ import javax.swing.event.CaretListener;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 import controller.Communication;
+import controller.CraneStateListener;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -44,10 +47,10 @@ public class CraneView extends JPanel {
 	 * Create the panel.
 	 */
 	public CraneView() {
-		setLayout(new MigLayout("", "[grow][][][][]", "[][][][][grow][]"));
+		setLayout(new MigLayout("", "[grow][][][][]", "[][][][][][][][][grow]"));
 		
 		final CranePanel cranePanel = new CranePanel();
-		add(cranePanel, "cell 0 0 1 6,grow");
+		add(cranePanel, "cell 0 0 1 9,grow");
 		
 		final JRadioButton move = new JRadioButton("Obr\u00F3\u0107");
 		add(move, "cell 4 0");
@@ -97,12 +100,24 @@ public class CraneView extends JPanel {
 		toY.setName("toY");
 		add(toY, "cell 4 4,growx,aligny top");
 		toY.setColumns(10);
+		JLabel czer = new JLabel(new ImageIcon("img/czer.png"));
 		
-		JButton start = new JButton("Start");
-		add(start, "cell 2 5,growx,aligny bottom");
+		add(czer, "cell 1 5,alignx right");
+		JLabel nieb = new JLabel(new ImageIcon("img/nieb.png"));
+		add(nieb, "cell 1 6,alignx right");
+		JLabel ziel = new JLabel(new ImageIcon("img/ziel.png"));
+		add(ziel, "cell 1 7,alignx right");
+		
+		final JButton start = new JButton("Start");
+		add(start, "cell 2 8,growx,aligny bottom");
 		
 		JButton stop = new JButton("Stop");
-		add(stop, "cell 4 5,growx,aligny bottom");
+		add(stop, "cell 4 8,growx,aligny bottom");
+		JLabel polozenie = new JLabel("Po³o¿enie aktualne");
+		add(polozenie, "cell 2 5 3 1");
+		add(from, "cell 2 6 3 1");
+		add(to, "cell 2 7 3 1");
+		
 		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{transfer, move, fromX, fromY, toX, toY, start, stop, from, fromXLabel, fromYLabel, to, toXLabel, toYLabel}));
 		
 		move.addActionListener(new ActionListener() {
@@ -111,6 +126,8 @@ public class CraneView extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				fromX.setEditable(false);
 				fromY.setEditable(false);
+				fromX.setBackground(new Color(240, 240, 240));
+				fromY.setBackground(new Color(240, 240, 240));
 			}
 		});
 		transfer.addActionListener(new ActionListener() {
@@ -119,6 +136,8 @@ public class CraneView extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				fromX.setEditable(true);
 				fromY.setEditable(true);
+				fromX.setBackground(Color.WHITE);
+				fromY.setBackground(Color.WHITE);
 			}
 		});
 		CaretListener checkField = new CaretListener() {
@@ -128,11 +147,13 @@ public class CraneView extends JPanel {
 				JTextField source = (JTextField)arg0.getSource();
 				String text = source.getText();
 				if (!text.matches("-?\\d+")) {
-					source.setBackground(new Color(255, 100, 100));
+					if (source.isEditable()) {
+						source.setBackground(new Color(255, 100, 100));
+					}
 				} else {
 					int war = Integer.parseInt(text);
 					String name = source.getName();
-					Component source2 = null;
+					JTextField source2 = null;
 					int war2 = 0;
 					if (name.equals("fromX")) {
 						try {
@@ -171,15 +192,18 @@ public class CraneView extends JPanel {
 						source.setBackground(new Color(255, 100, 100));
 						source2.setBackground(new Color(255, 100, 100));
 					} else {
-						source.setBackground(Color.white);
-						source2.setBackground(Color.white);
+						if (source.isEditable()) {
+							source.setBackground(Color.white);
+						} else if (source2.isEditable()) {
+							source2.setBackground(Color.white);
+						}
+					}
+					for (MouseListener ml : cranePanel.getMouseListeners()) {
 						Point p = CranePanel.cartesianToPanel(new Coord(war, -war2));
-						for (MouseListener ml : cranePanel.getMouseListeners()) {
-							if (name.equals("toX") || name.equals("toY")) {
-								ml.mousePressed(new MouseEvent(toX, 0, 0, 0, p.x, p.y, 0, 0, 0, false, MouseEvent.BUTTON3));
-							} else {
-								ml.mousePressed(new MouseEvent(toX, 0, 0, 0, p.x, p.y, 0, 0, 0, false, MouseEvent.BUTTON1));
-							}
+						if (name.equals("toX") || name.equals("toY")) {
+							ml.mousePressed(new MouseEvent(toX, 0, 0, 0, p.x, p.y, 0, 0, 0, false, MouseEvent.BUTTON3));
+						} else {
+							ml.mousePressed(new MouseEvent(toX, 0, 0, 0, p.x, p.y, 0, 0, 0, false, MouseEvent.BUTTON1));
 						}
 					}
 				}
@@ -258,6 +282,21 @@ public class CraneView extends JPanel {
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(Application.getMaintFrame(),"Urz¹dzenie nie odpowiada", "Brak odpowiedzi",JOptionPane.ERROR_MESSAGE);
 				}
+			}
+		});
+		if (Application.getCrane().getState() != State.READY) {
+			start.setEnabled(false);
+		}
+		Application.getCrane().addCraneStateListener(new CraneStateListener() {
+			
+			@Override
+			public void changed(State newState) {
+				if (newState == State.INIT || newState == State.MOVE || newState == State.TRANSFER) {
+					start.setEnabled(false);
+				} else if (newState == State.READY) {
+					start.setEnabled(true);
+				}
+				cranePanel.repaint();
 			}
 		});
 	}

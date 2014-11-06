@@ -10,4 +10,8 @@ public class Move {
 	public String toSend() {
 		return "m" + to.toSend();
 	}
+
+	public Coord getTo() {
+		return to;
+	}
 }

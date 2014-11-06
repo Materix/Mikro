@@ -45,6 +45,8 @@ boolean waitingForConnect() {
       while (bluetoothSerial.available()) {
         data = bluetoothSerial.read();
       }
+      init();
+      bluetoothSerial.println("OK");
       return true;
     } else {
       Serial.println("Zla wiadomosc");
@@ -55,6 +57,11 @@ boolean waitingForConnect() {
       return false;
     }
   }
+}
+
+void init() {
+  Serial.println("Inicjuje sie");
+  delay(2000);
 }
 
 boolean waitingForOrders() {
@@ -195,6 +202,7 @@ void move(int toX, int toY) {
   Serial.print(toX);
   Serial.print(", y=");
   Serial.println(toY);
+  delay(2000);
 }
 
 void transfer(int fromX, int fromY, int toX, int toY) {
@@ -209,4 +217,5 @@ void transfer(int fromX, int fromY, int toX, int toY) {
   Serial.print(", y=");
   Serial.println(toY);
   Serial.println("Opuszczam przedmiot");
+  delay(2000);
 }

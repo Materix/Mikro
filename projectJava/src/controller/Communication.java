@@ -33,6 +33,10 @@ public class Communication {
 		is = session.openInputStream();
 		this.sendMessage("c");
 		if (this.receiveString().equals("OK")) {
+			Application.getCrane().setState(State.INIT);
+			synchronized (Communication.lock) {
+				Communication.lock.notifyAll();
+			}
 			return true;
 		} else {
 			this.close();
@@ -92,6 +96,7 @@ public class Communication {
 				synchronized (Communication.lock) {
 					Communication.lock.notifyAll();
 				}
+				Application.getCrane().setCurrentPosition(move.getTo());
 				Application.getCrane().setState(State.MOVE);
 			}
 		} catch (Exception e) {
@@ -109,6 +114,7 @@ public class Communication {
 					Communication.lock.notifyAll();
 				}
 				Application.getCrane().setState(State.TRANSFER);
+				Application.getCrane().setCurrentPosition(transer.getTo());
 			}
 		} catch (Exception e) {
 			

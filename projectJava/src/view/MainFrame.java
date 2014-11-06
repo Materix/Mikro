@@ -33,8 +33,7 @@ public class MainFrame extends JFrame {
 			e.printStackTrace();
 		}
 		setTitle("¯uraw");
-		setJPanel(new CraneView());
-		//setJPanel(new ConnectView());
+		setJPanel(new ConnectView());
 	}
 	
 	public void setJPanel(JPanel contentPane) {

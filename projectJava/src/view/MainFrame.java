@@ -19,7 +19,9 @@ public class MainFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //TODO zmieniæ na roz³¹czanie
 		this.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e){
-				Application.getCommunication().close();
+				if (Application.getCommunication().connected) {
+					Application.getCommunication().close();
+				}
 				System.exit(0);
 			}
 		});

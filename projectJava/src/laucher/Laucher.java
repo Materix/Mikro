@@ -10,8 +10,8 @@ import view.MainFrame;
 
 public class Laucher {
 	public static void main(String[] args) {
-		Application.setCommunication(new Communication());
 		Application.setCrane(new Crane(new Coord(Crane.round, 0), 0));
+		Application.setCommunication(new Communication());
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {

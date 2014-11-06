@@ -199,7 +199,7 @@ public class CraneView extends JPanel {
 						}
 					}
 					for (MouseListener ml : cranePanel.getMouseListeners()) {
-						Point p = CranePanel.cartesianToPanel(new Coord(war, -war2));
+						Point p = CranePanel.cartesianToPanel(new Coord(war, war2));
 						if (name.equals("toX") || name.equals("toY")) {
 							ml.mousePressed(new MouseEvent(toX, 0, 0, 0, p.x, p.y, 0, 0, 0, false, MouseEvent.BUTTON3));
 						} else {

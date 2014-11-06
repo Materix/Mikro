@@ -19,6 +19,7 @@ public class Communication {
 	OutputStream os;
 	InputStream is;
 	private ReceiveListener listener;
+	public boolean connected = false;
 	
 	public Communication() {
 		this.listener = new ReceiveListener(Application.getCrane());
@@ -34,6 +35,8 @@ public class Communication {
 		this.sendMessage("c");
 		if (this.receiveString().equals("OK")) {
 			Application.getCrane().setState(State.INIT);
+			connected = true;
+			listener.setListenerStream(is);
 			synchronized (Communication.lock) {
 				Communication.lock.notifyAll();
 			}
@@ -46,6 +49,7 @@ public class Communication {
 	
 	public void sendMessage(String msg) throws IOException {
 		msg += "$";
+		System.out.println(msg);
 		os.write(msg.getBytes());
 	}
 	
@@ -55,11 +59,13 @@ public class Communication {
 		synchronized (Communication.lock) {
 			while(is.available() == 0) {
 				tried++;
+				System.out.println(tried);
 				if (tried >= MAX_TRIED) {
 					throw new IOException("Przekroczona ilosc prob");
 				}
 				try {
-					Thread.sleep(100);
+					System.out.println("ete");
+					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -70,6 +76,7 @@ public class Communication {
 			while ((c = (char)(is.read())) != 13) {
 				receive += c;
 			}
+			is.read();
 			System.out.println(receive);
 		}
 		return receive;
@@ -77,7 +84,6 @@ public class Communication {
 	
 	public void close() {
 		try {
-			sendStop();
 			sendMessage("d");
 			is.close();
 			os.close();
@@ -109,16 +115,20 @@ public class Communication {
 		this.sendMessage(transer.toSend());
 		try {
 			if (!this.receiveString().equals("OK")) {
+				System.out.println("jj");
 				throw new IOException();
 			} else {
+				System.out.println(Application.getCrane().getState());
 				synchronized (Communication.lock) {
+					System.out.println(Application.getCrane().getState());
 					Communication.lock.notifyAll();
 				}
 				Application.getCrane().setState(State.TRANSFER);
+				System.out.println(Application.getCrane().getState());
 				Application.getCrane().setCurrentPosition(transer.getTo());
 			}
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 		}
 	}
 	

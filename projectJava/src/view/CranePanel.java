@@ -91,7 +91,7 @@ public class CranePanel extends JPanel {
     }
 	
 	public static Point cartesianToPanel(Coord coord) {
-		return new Point((coord.x * scale) / 20 + 250, (coord.y * scale) / 20 + 250);
+		return new Point((coord.x * scale) / 20 + 250, (-coord.y * scale) / 20 + 250);
 	}
 	
 	public static Coord panelToCartesian(Point point) {

@@ -49,7 +49,6 @@ public class Communication {
 	
 	public void sendMessage(String msg) throws IOException {
 		msg += "$";
-		System.out.println(msg);
 		os.write(msg.getBytes());
 	}
 	
@@ -77,7 +76,6 @@ public class Communication {
 				receive += c;
 			}
 			is.read();
-			System.out.println(receive);
 		}
 		return receive;
 	}
@@ -115,16 +113,12 @@ public class Communication {
 		this.sendMessage(transer.toSend());
 		try {
 			if (!this.receiveString().equals("OK")) {
-				System.out.println("jj");
 				throw new IOException();
 			} else {
-				System.out.println(Application.getCrane().getState());
 				synchronized (Communication.lock) {
-					System.out.println(Application.getCrane().getState());
 					Communication.lock.notifyAll();
 				}
 				Application.getCrane().setState(State.TRANSFER);
-				System.out.println(Application.getCrane().getState());
 				Application.getCrane().setCurrentPosition(transer.getTo());
 			}
 		} catch (Exception e) {

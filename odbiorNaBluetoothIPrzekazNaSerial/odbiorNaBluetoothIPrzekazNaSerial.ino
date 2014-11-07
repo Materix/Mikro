@@ -6,15 +6,13 @@ void setup() {
   delay(5000);
   Serial.begin(9600);
   bluetoothSerial.begin(9600);
-  Serial.println("Czekam na wiadomosci z bluetooth");
+  //Serial.println("Czekam na wiadomosci z bluetooth");
   bluetoothSerial.print("AT");
   while(!bluetoothSerial.available()) {
     ;
   }
   data = bluetoothSerial.read();
-  Serial.print(data);
   data = bluetoothSerial.read();
-  Serial.println(data);
 }
 
 void loop() {
@@ -45,7 +43,7 @@ boolean waitingForConnect() {
       while (bluetoothSerial.available()) {
         data = bluetoothSerial.read();
       }
-      init();
+      initialize();
       bluetoothSerial.println("OK");
       return true;
     } else {
@@ -59,7 +57,7 @@ boolean waitingForConnect() {
   }
 }
 
-void init() {
+void initialize() {
   Serial.println("Inicjuje sie");
   delay(2000);
 }
@@ -73,22 +71,23 @@ boolean waitingForOrders() {
     data = bluetoothSerial.read();
     if (data == 'm') {
       receiveAndMakeMoveOrder();
-    } else if (data = 't') {
+    } else if (data == 't') {
       receiveAndMakeTransferOrder();
-    } else if (data = 'd') {
-      Serial.print("Koniec polaczenia");
+    } else if (data == 'd') {
+      Serial.println("Koniec polaczenia");
       return true;
     } else {
-      Serial.print("Bledny rozkaz");
-      while (bluetoothSerial.available()) {
-        data = bluetoothSerial.read();
-      }
+      Serial.println("Bledny rozkaz");
     }
+  }
+  while (bluetoothSerial.available()) {
+    data = bluetoothSerial.read();
   }
   return false;
 }
 
 boolean receiveAndMakeMoveOrder() {
+  boolean minus = false;
   int toX = 0, toY = 0;
   data = bluetoothSerial.read();
   if (data == 'c') {
@@ -99,21 +98,33 @@ boolean receiveAndMakeMoveOrder() {
         if (data >= 48 && data <= 57) {
           toX *= 10;
           toX += data - 48; 
+        } else if (data == '-') {
+          minus = true;
         } else {
           return false;
         }
         data = bluetoothSerial.read();
       }
+      if (minus) {
+        toX = -toX;
+      }
+      minus = false;
       data = bluetoothSerial.read();
       while (data != '$') {
         if (data >= 48 && data <= 57) {
           toY *= 10;
           toY += data - 48; 
+        } else if (data == '-') {
+          minus = true;
         } else {
           return false;
         }
         data = bluetoothSerial.read();
       }
+      if (minus) {
+        toY = -toY;
+      }
+      minus = false;;
     }
   } else {
     return false;
@@ -121,13 +132,14 @@ boolean receiveAndMakeMoveOrder() {
   while (bluetoothSerial.available()) {
     data = bluetoothSerial.read();
   }
-  bluetoothSerial("OK");
+  bluetoothSerial.println("OK");
   move(toX, toY);
-  bluetoothSerial("OK");
+  bluetoothSerial.println("OK");
   return true;
 }
 
 boolean receiveAndMakeTransferOrder() {
+  boolean minus = false;
   int toX = 0, toY = 0, fromX = 0, fromY = 0;
   data = bluetoothSerial.read();
   if (data == 'f') {
@@ -140,21 +152,33 @@ boolean receiveAndMakeTransferOrder() {
           if (data >= 48 && data <= 57) {
             fromX *= 10;
             fromX += data - 48; 
+          } else if (data == '-') {
+            minus = true;
           } else {
             return false;
           }
           data = bluetoothSerial.read();
         }
+        if (minus) {
+          fromX = -fromX;
+        }
+        minus = false;
         data = bluetoothSerial.read();
         while (data != 't') {
           if (data >= 48 && data <= 57) {
             fromY *= 10;
             fromY += data - 48; 
+          } else if (data == '-') {
+            minus = true;
           } else {
             return false;
           }
           data = bluetoothSerial.read();
         }
+        if (minus) {
+          fromY = -fromY;
+        }
+        minus = false;
         data = bluetoothSerial.read();
         if (data == 'c') {
           data = bluetoothSerial.read();
@@ -164,21 +188,33 @@ boolean receiveAndMakeTransferOrder() {
               if (data >= 48 && data <= 57) {
                 toX *= 10;
                 toX += data - 48; 
+              } else if (data == '-') {
+                minus = true;
               } else {
                 return false;
               }
               data = bluetoothSerial.read();
             }
+            if (minus) {
+              toX = -toX;
+            }
+            minus = false;
             data = bluetoothSerial.read();
             while (data != '$') {
               if (data >= 48 && data <= 57) {
                 toY *= 10;
                 toY += data - 48; 
+              } else if (data == '-') {
+                minus = true;
               } else {
                 return false;
               }
               data = bluetoothSerial.read();
             }
+            if (minus) {
+              toY = -toY;
+            }
+            minus = false;
           }
         }
       }
@@ -189,9 +225,9 @@ boolean receiveAndMakeTransferOrder() {
   while (bluetoothSerial.available()) {
     data = bluetoothSerial.read();
   }
-  bluetoothSerial("OK");
+  bluetoothSerial.println("OK");
   transfer(fromX, fromY, toX, toY);
-  bluetoothSerial("OK");
+  bluetoothSerial.println("OK");
   
 }
 

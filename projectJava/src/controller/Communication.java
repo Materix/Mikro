@@ -58,12 +58,10 @@ public class Communication {
 		synchronized (Communication.lock) {
 			while(is.available() == 0) {
 				tried++;
-				System.out.println(tried);
 				if (tried >= MAX_TRIED) {
 					throw new IOException("Przekroczona ilosc prob");
 				}
 				try {
-					System.out.println("ete");
 					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
